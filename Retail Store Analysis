@@ -1,0 +1,63 @@
+Retail Store Analysis
+===================================================================================
+
+#This project looks at different store attributes and analyzes 
+which attributes drive sales performance, and to what extent.
+
+===================================================================================
+
+> stores <- read.csv(file.choose(),head=TRUE,sep=",")
+
+> str(stores)
+
+> summary(stores)
+
+> attach(stores)
+
+> by(stores,Corp.Alpha,summary)
+
+> by(stores,Climate,summary)
+
+> boxplot(Sales ~ Climate)
+
+> boxplot(Sales ~ Total.SF)
+
+> boxplot(Sales ~ Corp.Alpha)
+
+> boxplot(Sales ~ Region, xlim = c(0.6,7.4), col="light blue")
+
+> boxplot(Sales ~ Density.Cap, main = "Density Effect on Sales", xlab = "Density Cap", ylab = "Sales", col="light green")
+
+> table(Corp.Alpha,Region)
+
+> table(Corp.Alpha,Climate)
+
+> table(Corp.Alpha,Climate,Region)
+
+> flat.table = ftable(table(Corp.Alpha,Climate,Region))
+> prop.table(flat.table,1)
+> m <- prop.table(flat.table,1)
+> m[] <- sprintf("%.1f%%",round(prop.table(m,1)*100, 3))
+> m
+
+> alpha.by.climate = table(Climate, Corp.Alpha)
+> barplot(alpha.by.climate, beside=T, main="Alpha by Climate", ylab="Freq", xlab="Alpha", col=c("blue","red","green"))
+> legend(x=8.5, y=25, legend=c("Cold","Hot","Swing"),fill=c("blue","red","green"))
+
+> results = chisq.test(alpha.by.climate)
+> results
+
+> results$expected
+> results$residuals
+
+> aov.out = aov(Sales ~ Total.SF + Climate + Region + Density.Cap, data=stores)
+> summary(aov.out)
+
+> TukeyHSD(aov.out, which=c("Climate"))
+
+> round(cor(stores[,c(3,6,7)]),2)
+
+> lm.model = lm(Sales ~ Total.SF + Climate + Region + Density.Cap, data=stores)
+> summary(lm.model)
+
+> step(lm.model, direction="backward")
