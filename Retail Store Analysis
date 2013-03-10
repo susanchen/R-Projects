@@ -1,63 +1,107 @@
 Retail Store Analysis
-===================================================================================
+=================================================================================================================
 
-#This project looks at different store attributes and analyzes 
+# This project looks at different store attributes and analyzes 
 which attributes drive sales performance, and to what extent.
 
-===================================================================================
+# Filename: “stores”
+# Store Performance Metric: “Sales”
+# Store Attributes: “Alpha” (a categorical rank of stores), “Climate”, “SF” (Sq. Ft.), “Density.Cap”, “Region”
+
+=================================================================================================================
 
 > stores <- read.csv(file.choose(),head=TRUE,sep=",")
+# Open the file that we choose: "stores"
 
 > str(stores)
+# Ask to see the structure of this data object
 
 > summary(stores)
+# Get a data summary
 
 > attach(stores)
+# Make the variables inside “stores” visible to R
 
-> by(stores,Corp.Alpha,summary)
+> by(stores,Alpha,summary)
+# Summarize each Alpha group separately
 
 > by(stores,Climate,summary)
+# Summarize each Climate group separately
 
 > boxplot(Sales ~ Climate)
+# Boxplot showing Climate’s relationship to Sales
 
-> boxplot(Sales ~ Total.SF)
+> boxplot(Sales ~ SF)
+# Boxplot showing SF’s relationship to Sales
 
-> boxplot(Sales ~ Corp.Alpha)
+> boxplot(Sales ~ Alpha)
+# Boxplot showing Alpha’s relationship to Sales
 
 > boxplot(Sales ~ Region, xlim = c(0.6,7.4), col="light blue")
+# Boxplot showing Region’s relationship to Sales, X-axis limits are shown, box color is light blue
 
 > boxplot(Sales ~ Density.Cap, main = "Density Effect on Sales", xlab = "Density Cap", ylab = "Sales", col="light green")
+# Boxplot showing Density.Cap’s relationship to Sales, Title name is shown, X-Axis name is shown, Y-Axis name is shown, box color is light green
 
-> table(Corp.Alpha,Region)
+> table(Alpha,Region)
+# Table showing store counts by Alpha and Region
 
-> table(Corp.Alpha,Climate)
+> table(Alpha,Climate)
+# Table showing store counts by Alpha and Climate
 
-> table(Corp.Alpha,Climate,Region)
+> table(Alpha,Climate,Region)
+# Table showing store counts by Alpha, Climate, and Region
 
-> flat.table = ftable(table(Corp.Alpha,Climate,Region))
+> flat.table = ftable(table(Alpha,Climate,Region))
+# Store output so we can work with it
+
 > prop.table(flat.table,1)
-> m <- prop.table(flat.table,1)
-> m[] <- sprintf("%.1f%%",round(prop.table(m,1)*100, 3))
-> m
+# Convert raw counts to proportions 
 
-> alpha.by.climate = table(Climate, Corp.Alpha)
+> store.pct <- prop.table(flat.table,1)
+# Store proportions as “store.pct”
+
+> store.pct[] <- sprintf("%.1f%%",round(prop.table(store.pct,1)*100, 3))
+# Convert proportions to percents with 1 decimal place
+
+> store.pct
+# Print “store.pct”
+
+> alpha.by.climate = table(Climate, Alpha)
+# Store Climate-Alpha table as “alpha.by.climate”
+
 > barplot(alpha.by.climate, beside=T, main="Alpha by Climate", ylab="Freq", xlab="Alpha", col=c("blue","red","green"))
+# Boxplot of “alpha.by.climate” with title, X-axis, and Y-axis shown, and columns colored
+
 > legend(x=8.5, y=25, legend=c("Cold","Hot","Swing"),fill=c("blue","red","green"))
+# Show legend with legend size, and color key
 
 > results = chisq.test(alpha.by.climate)
 > results
+# Show Chi-Square test of “alpha.by.climate”
 
 > results$expected
-> results$residuals
+# View the expected values
 
-> aov.out = aov(Sales ~ Total.SF + Climate + Region + Density.Cap, data=stores)
+> results$residuals
+# View the residuals in each cell
+
+> aov.out = aov(Sales ~ SF + Climate + Region + Density.Cap, data=stores)
 > summary(aov.out)
+# Request a 4-way ANOVA without testing the interactions
 
 > TukeyHSD(aov.out, which=c("Climate"))
+# A Tukey HSD post hoc test (Tukey multiple comparisons of means)
 
 > round(cor(stores[,c(3,6,7)]),2)
+# Show correlation matrix among Density.Cap, SF, and Sales
 
-> lm.model = lm(Sales ~ Total.SF + Climate + Region + Density.Cap, data=stores)
+> lm.model = lm(Sales ~ SF + Climate + Region + Density.Cap, data=stores)
 > summary(lm.model)
+# Show a linear multiple regression using the lm( ), or "linear model" function of store attributes to sales
 
 > step(lm.model, direction="backward")
+# Do backwards regression to eliminate the nonsignificant terms
+
+> rm(list=ls()) 
+# Clean up file
